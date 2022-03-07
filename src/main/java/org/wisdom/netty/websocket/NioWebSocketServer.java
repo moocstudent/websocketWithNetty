@@ -2,8 +2,11 @@ package org.wisdom.netty.websocket;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 import org.apache.log4j.Logger;
 
 public class NioWebSocketServer {
@@ -16,6 +19,8 @@ public class NioWebSocketServer {
             ServerBootstrap bootstrap=new ServerBootstrap();
             bootstrap.group(boss,work);
             bootstrap.channel(NioServerSocketChannel.class);
+            bootstrap.handler(new LoggingHandler(LogLevel.INFO));//日志
+            bootstrap.option(ChannelOption.SO_BACKLOG, 10000);//处理队列
             bootstrap.childHandler(new NioWebSocketChannelInitializer());
             Channel channel = bootstrap.bind(8081).sync().channel();
             logger.info("webSocket服务器启动成功："+channel);

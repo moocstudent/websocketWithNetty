@@ -2,7 +2,10 @@ package org.wisdom.netty.websocket;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.*;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -27,9 +30,11 @@ public class NioWebSocketHandler extends SimpleChannelInboundHandler<Object> {
         logger.debug("收到消息："+msg);
         if (msg instanceof FullHttpRequest){
             //以http请求形式接入，但是走的是websocket
-                handleHttpRequest(ctx, (FullHttpRequest) msg);
+            logger.info("channelRead0 FullHttpRequest");
+            handleHttpRequest(ctx, (FullHttpRequest) msg);
         }else if (msg instanceof  WebSocketFrame){
             //处理websocket客户端的消息
+            logger.info("channelRead0 WebSocketFrame");
             handlerWebSocketFrame(ctx, (WebSocketFrame) msg);
         }
     }
@@ -73,12 +78,12 @@ public class NioWebSocketHandler extends SimpleChannelInboundHandler<Object> {
         // 返回应答消息
         String request = ((TextWebSocketFrame) frame).text();
         logger.debug("服务端收到：" + request);
-        TextWebSocketFrame tws = new TextWebSocketFrame(new Date().toString()
-                + ctx.channel().id() + "：" + request);
+        TextWebSocketFrame tws = new TextWebSocketFrame("根据"+request+"查询到的数据list");
+//        TextWebSocketFrame tws = new TextWebSocketFrame("some lover");
         // 群发
-        ChannelSupervise.send2All(tws);
+//        ChannelSupervise.send2All(tws);
         // 返回【谁发的发给谁】
-        // ctx.channel().writeAndFlush(tws);
+         ctx.channel().writeAndFlush(tws);
     }
     /**
      * 唯一的一次http请求，用于创建websocket
@@ -93,9 +98,11 @@ public class NioWebSocketHandler extends SimpleChannelInboundHandler<Object> {
                     HttpVersion.HTTP_1_1, HttpResponseStatus.BAD_REQUEST));
             return;
         }
+
         WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(
                 "ws://localhost:8081/websocket", null, false);
         handshaker = wsFactory.newHandshaker(req);
+        logger.info("handshaker:"+handshaker);
         if (handshaker == null) {
             WebSocketServerHandshakerFactory
                     .sendUnsupportedVersionResponse(ctx.channel());

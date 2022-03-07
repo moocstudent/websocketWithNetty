@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title></title>
+</head>
+<body>
+
+
+<div id="responseText"></div>
+
+</body>
+
+
+<script type="text/javascript">
+  var socket;
+    
+    
+    if(!window.WebSocket){
+   
+        window.WebSocket = window.MozWebSocket;
+    }
+   
+    if(window.WebSocket){
+        socket = new WebSocket("ws://localhost:8081/websocket");
+        
+        socket.onmessage = function(event){
+   
+              var ta = document.getElementById('responseText');
+              console.log("onmessage :"+event.data);
+              // ta.
+              // ta.value += event.data+"\r\n";
+        };
+   
+        socket.onopen = function(event){
+   
+              var ta = document.getElementById('responseText');
+
+
+              console.log("onopen 与服务端建立websocket成功 打开WebSoket 服务正常，浏览器支持WebSoket!:");
+              send("电子秤标识123");
+              // ta.value = "打开WebSoket 服务正常，浏览器支持WebSoket!"+"\r\n";
+              
+        };
+   
+        socket.onclose = function(event){
+   
+              var ta = document.getElementById('responseText');
+              console.log("onclose WebSocket 关闭:"+ta);
+              // ta.value = "";
+              // ta.value = "WebSocket 关闭"+"\r\n";
+        };
+    }else{
+          alert("您的浏览器不支持WebSocket协议！");
+    }
+   
+    function send(message){
+      if(!window.WebSocket){return;}
+      if(socket.readyState == WebSocket.OPEN){
+          socket.send(message);
+      }else{
+          alert("WebSocket 连接没有建立成功！");
+      }
+      
+    }
+
+    // send("hello world");
+
+</script>
+</html>

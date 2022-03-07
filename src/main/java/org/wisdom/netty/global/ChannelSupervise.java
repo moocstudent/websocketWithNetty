@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 public class ChannelSupervise {
-    private   static ChannelGroup GlobalGroup=new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+    private  static ChannelGroup GlobalGroup=new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
     private  static ConcurrentMap<String, ChannelId> ChannelMap=new ConcurrentHashMap();
     public  static void addChannel(Channel channel){
         GlobalGroup.add(channel);
